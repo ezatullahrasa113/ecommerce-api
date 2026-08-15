@@ -9,6 +9,7 @@ urlpatterns = [
     path('api/cart/',include('cart.urls')),
     path('api/orders/',include('orders.urls')),
     path('api/checkout/',include('checkout.urls')),
+    path('api/',include('payments.urls')),
 ]
 
 
