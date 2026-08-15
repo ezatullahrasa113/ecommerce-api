@@ -37,6 +37,7 @@ class User(AbstractUser):
     username = None
 
     email = models.EmailField(unique=True)
+    is_verified = models.BooleanField(default=False)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
