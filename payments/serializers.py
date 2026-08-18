@@ -32,3 +32,16 @@ class PaymentSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+
+
+class PaymentCreateSerializer(serializers.Serializer):
+
+    payment_method = serializers.CharField(
+        max_length=50,
+    )
+
+class PaymentVerifySerializer(serializers.Serializer):
+
+    transaction_id = serializers.CharField(
+        max_length=255,
+    )

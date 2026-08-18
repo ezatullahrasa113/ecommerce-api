@@ -2,13 +2,33 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from drf_spectacular.utils import (
+    OpenApiParameter,
+    OpenApiTypes,
+    extend_schema,
+)
 
 from .models import Payment
-from .serializers import PaymentSerializer
 from .services import (
 PaymentError,
 PaymentService,
 )
+
+from .serializers import (
+    PaymentSerializer,
+    PaymentCreateSerializer,
+    PaymentVerifySerializer,
+)
+
+
+from drf_spectacular.utils import (
+    OpenApiParameter,
+    OpenApiResponse,
+    OpenApiTypes,
+    extend_schema,
+)
+
+
 
 class PaymentViewSet(viewsets.ReadOnlyModelViewSet):
 
@@ -19,6 +39,13 @@ class PaymentViewSet(viewsets.ReadOnlyModelViewSet):
     ]
 
     def get_queryset(self):
+
+        if getattr(
+            self,
+            "swagger_fake_view",
+            False,
+        ):
+            return Payment.objects.none()
 
         return (
             Payment.objects
@@ -31,6 +58,21 @@ class PaymentViewSet(viewsets.ReadOnlyModelViewSet):
     # =====================================================
     # Create payment
     # =====================================================
+    
+    @extend_schema(
+        summary="Create payment",
+        description=(
+            "Creates a pending payment for the authenticated "
+            "user's order."
+        ),
+        request=PaymentCreateSerializer,
+        responses={
+            201: PaymentSerializer,
+            400: OpenApiResponse(
+                description="Payment creation failed."
+            ),
+        },
+    )
 
     @action(
         detail=False,
@@ -77,11 +119,40 @@ class PaymentViewSet(viewsets.ReadOnlyModelViewSet):
     # Verify payment
     # =====================================================
 
+    @extend_schema(
+        summary="Verify payment",
+        description=(
+            "Verifies a pending payment with the payment "
+            "provider. If verification succeeds, the payment "
+            "is marked as succeeded and the order is confirmed."
+        ),
+        parameters=[
+            OpenApiParameter(
+                name="id",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+                required=True,
+                description="ID of the payment.",
+            ),
+        ],
+        request=PaymentVerifySerializer,
+        responses={
+            200: PaymentSerializer,
+            400: OpenApiResponse(
+                description="Payment verification failed."
+            ),
+            404: OpenApiResponse(
+                description="Payment not found.",
+            ),
+        },
+    )
+
     @action(
         detail=True,
         methods=["post"],
         url_path="verify",
     )
+
     def verify_payment(
         self,
         request,

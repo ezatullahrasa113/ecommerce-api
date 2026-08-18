@@ -67,7 +67,10 @@ class RegisterTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-        self.assertIn("password", response.data)
+        self.assertIn(
+            "Passwords do not match.",
+            response.data["error"]["fields"]["password"],
+        )
 
     def test_password_too_short(self):
         data = {

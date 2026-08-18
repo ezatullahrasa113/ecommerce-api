@@ -1,0 +1,1747 @@
+openapi: 3.0.3
+info:
+  title: E-Commerce API
+  version: 1.0.0
+  description: Production-style E-Commerce REST API built with Django REST Framework.
+paths:
+  /api/accounts/change-password/:
+    post:
+      operationId: accounts_change_password_create
+      description: Changes the authenticated user's password.
+      summary: Change password
+      tags:
+      - accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+            examples:
+              ChangePasswordRequest:
+                value:
+                  old_password: OldPassword123!
+                  new_password: NewStrongPassword456!
+                summary: Change the current password
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: Password changed successfully.
+        '400':
+          description: Invalid old password or new password.
+        '401':
+          description: Authentication required.
+  /api/accounts/email-verify/:
+    post:
+      operationId: accounts_email_verify_create
+      description: Verifies a user's email address using the UID and verification
+        token.
+      summary: Verify email address
+      tags:
+      - accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailVerificationRequest'
+            examples:
+              EmailVerificationRequest:
+                value:
+                  uid: MQ
+                  token: example-verification-token
+                summary: Email verification request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EmailVerificationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EmailVerificationRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: Email verified successfully.
+        '400':
+          description: Invalid, expired, or already-used verification token.
+  /api/accounts/login/:
+    post:
+      operationId: accounts_login_create
+      description: Authenticates a user and returns an access token and refresh token.
+      summary: Login
+      tags:
+      - accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPairRequest'
+            examples:
+              LoginRequest:
+                value:
+                  email: customer@example.com
+                  password: StrongPassword123!
+                summary: User login
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPairRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPairRequest'
+        required: true
+      responses:
+        '200':
+          description: Authentication successful.
+        '401':
+          description: Invalid email or password.
+  /api/accounts/logout/:
+    post:
+      operationId: accounts_logout_create
+      description: Blacklists the supplied refresh token and logs the authenticated
+        user out.
+      summary: Logout
+      tags:
+      - accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogoutRequest'
+            examples:
+              LogoutRequest:
+                value:
+                  refresh: eyJhbGciOiJIUzI1NiIs...
+                summary: Blacklist refresh token
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LogoutRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LogoutRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '205':
+          description: Successfully logged out.
+        '400':
+          description: Invalid or expired refresh token.
+        '401':
+          description: Authentication required.
+  /api/accounts/me/:
+    get:
+      operationId: accounts_me_retrieve
+      description: Returns the authenticated user's profile.
+      summary: Get current user
+      tags:
+      - accounts
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+        '401':
+          description: Authentication credentials were not provided or are invalid.
+    put:
+      operationId: accounts_me_update
+      description: Updates the authenticated user's profile.
+      summary: Update current user
+      tags:
+      - accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+        '400':
+          description: Invalid profile data.
+        '401':
+          description: Authentication required.
+    patch:
+      operationId: accounts_me_partial_update
+      description: Partially updates the authenticated user's profile.
+      summary: Partially update current user
+      tags:
+      - accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+        '400':
+          description: Invalid profile data.
+        '401':
+          description: Authentication required.
+  /api/accounts/password-reset/:
+    post:
+      operationId: accounts_password_reset_create
+      description: Sends a password reset email to the specified email address.
+      summary: Request password reset
+      tags:
+      - accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequestRequest'
+            examples:
+              PasswordResetRequest:
+                value:
+                  email: customer@example.com
+                summary: Password reset request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequestRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequestRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: Password reset email sent.
+        '400':
+          description: Invalid email address.
+  /api/accounts/password-reset-confirm/:
+    post:
+      operationId: accounts_password_reset_confirm_create
+      description: Validates the password reset token and sets a new password.
+      summary: Confirm password reset
+      tags:
+      - accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirmRequest'
+            examples:
+              PasswordResetConfirmation:
+                value:
+                  uid: MQ
+                  token: example-reset-token
+                  new_password: NewStrongPassword456!
+                  new_password_confirm: NewStrongPassword456!
+                summary: Password reset confirmation
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirmRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirmRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: Password has been reset successfully.
+        '400':
+          description: Invalid or expired reset token.
+  /api/accounts/register/:
+    post:
+      operationId: accounts_register_create
+      description: Creates a new user account and sends an email verification link.
+      summary: Register a new user
+      tags:
+      - accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+            examples:
+              RegistrationRequest:
+                value:
+                  email: customer@example.com
+                  password: StrongPassword123!
+                  password_confirm: StrongPassword123!
+                summary: Create a new account
+                description: Example registration data.
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                RegistrationResponse:
+                  value:
+                    id: 1
+                    email: customer@example.com
+                    first_name: ''
+                    last_name: ''
+                  summary: Account created
+          description: ''
+        '400':
+          description: Invalid registration data.
+  /api/accounts/token/refresh/:
+    post:
+      operationId: accounts_token_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /api/cart/:
+    get:
+      operationId: my_cart_retrieve
+      description: Returns the authenticated user's shopping cart. If the user does
+        not have a cart yet, a new empty cart is created automatically.
+      summary: Retrieve my cart
+      tags:
+      - cart
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+          description: ''
+  /api/cart/{id}/:
+    get:
+      operationId: cart_detail_retrieve
+      description: Returns a specific shopping cart by its ID. Users can access their
+        own cart, while staff users can access other carts.
+      summary: Retrieve cart by ID
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - cart
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+          description: ''
+        '404':
+          description: Cart not found.
+  /api/cart/items/:
+    get:
+      operationId: cart_items_list
+      description: Returns the authenticated user's cart items. Staff users can access
+        cart items from all users.
+      summary: List cart items
+      tags:
+      - cart
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CartItem'
+          description: ''
+    post:
+      operationId: cart_items_create
+      description: Adds a product to the authenticated user's cart. If the product
+        already exists in the cart, its quantity is increased instead of creating
+        a duplicate item.
+      summary: Add product to cart
+      tags:
+      - cart
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartItemRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CartItemRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CartItemRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartItem'
+          description: ''
+        '400':
+          description: Invalid product or quantity.
+  /api/cart/items/{id}/:
+    get:
+      operationId: cart_items_retrieve
+      description: Returns a specific cart item.
+      summary: Retrieve cart item
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this cart item.
+        required: true
+      tags:
+      - cart
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartItem'
+          description: ''
+        '404':
+          description: Cart item not found.
+    put:
+      operationId: cart_items_update
+      description: Replaces the quantity of an existing cart item.
+      summary: Update cart item
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this cart item.
+        required: true
+      tags:
+      - cart
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartItemRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CartItemRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CartItemRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartItem'
+          description: ''
+        '400':
+          description: Invalid cart item data.
+        '404':
+          description: Cart item not found.
+    patch:
+      operationId: cart_items_partial_update
+      description: Partially updates an existing cart item.
+      summary: Partially update cart item
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this cart item.
+        required: true
+      tags:
+      - cart
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCartItemRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCartItemRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCartItemRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartItem'
+          description: ''
+        '400':
+          description: Invalid cart item data.
+        '404':
+          description: Cart item not found.
+    delete:
+      operationId: cart_items_destroy
+      description: Removes a product from the authenticated user's cart.
+      summary: Remove cart item
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this cart item.
+        required: true
+      tags:
+      - cart
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: Cart item removed successfully.
+        '404':
+          description: Cart item not found.
+  /api/checkout/:
+    post:
+      operationId: checkout_create
+      description: Creates an order from the authenticated user's cart. The Idempotency-Key
+        header prevents duplicate checkout requests from creating multiple orders.
+      summary: Checkout cart
+      parameters:
+      - in: header
+        name: Idempotency-Key
+        schema:
+          type: string
+        description: Unique key used to safely retry the checkout request without
+          creating a duplicate order.
+        required: true
+      tags:
+      - checkout
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          description: Checkout completed successfully.
+        '400':
+          description: Checkout validation failed.
+        '404':
+          description: Cart not found.
+  /api/orders/:
+    get:
+      operationId: order_list
+      description: Returns orders belonging to the authenticated user. Staff users
+        can access all orders.
+      summary: List orders
+      tags:
+      - orders
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+          description: ''
+  /api/orders/{id}/:
+    get:
+      operationId: order_retrieve
+      description: Returns a specific order. Customers can access their own orders,
+        while staff users can access any order.
+      summary: Retrieve order
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Order ID.
+        required: true
+      tags:
+      - orders
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+          description: ''
+        '404':
+          description: Order not found.
+  /api/orders/{id}/status/:
+    post:
+      operationId: order_change_status
+      description: Changes the status of an order according to the allowed order state
+        transitions. Customers can only cancel their own orders. Staff users can perform
+        other allowed status transitions.
+      summary: Change order status
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Order ID.
+        required: true
+      tags:
+      - orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  description: New order status.
+              required:
+              - status
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+          description: ''
+        '400':
+          description: Status is missing or the requested status transition is invalid.
+        '403':
+          description: Customer attempted a status change other than cancellation.
+        '404':
+          description: Order not found.
+  /api/payments/:
+    get:
+      operationId: payments_list
+      tags:
+      - payments
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Payment'
+          description: ''
+  /api/payments/{order_id}/create/:
+    post:
+      operationId: payments_create_create
+      description: Creates a pending payment for the authenticated user's order.
+      summary: Create payment
+      parameters:
+      - in: path
+        name: order_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - payments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PaymentCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PaymentCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+          description: ''
+        '400':
+          description: Payment creation failed.
+  /api/payments/{id}/:
+    get:
+      operationId: payments_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this payment.
+        required: true
+      tags:
+      - payments
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+          description: ''
+  /api/payments/{id}/verify/:
+    post:
+      operationId: payments_verify_create
+      description: Verifies a pending payment with the payment provider. If verification
+        succeeds, the payment is marked as succeeded and the order is confirmed.
+      summary: Verify payment
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: ID of the payment.
+        required: true
+      tags:
+      - payments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentVerifyRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PaymentVerifyRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PaymentVerifyRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+          description: ''
+        '400':
+          description: Payment verification failed.
+        '404':
+          description: Payment not found.
+  /api/products/categories/:
+    get:
+      operationId: products_categories_list
+      description: Returns all product categories.
+      summary: List categories
+      tags:
+      - products
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+          description: ''
+    post:
+      operationId: products_categories_create
+      description: Creates a new product category. The slug is generated automatically.
+      summary: Create category
+      tags:
+      - products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CategoryRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CategoryRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+        '400':
+          description: Invalid category data.
+  /api/products/categories/{slug}/:
+    get:
+      operationId: products_categories_retrieve
+      description: Returns a category using its unique slug.
+      summary: Retrieve category
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        description: Unique category slug.
+        required: true
+      tags:
+      - products
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+        '404':
+          description: Category not found.
+    put:
+      operationId: products_categories_update
+      description: Replaces an existing category.
+      summary: Update category
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CategoryRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CategoryRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+        '400':
+          description: Invalid category data.
+        '404':
+          description: Category not found.
+    patch:
+      operationId: products_categories_partial_update
+      description: Partially updates an existing category.
+      summary: Partially update category
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCategoryRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCategoryRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCategoryRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+        '400':
+          description: Invalid category data.
+        '404':
+          description: Category not found.
+    delete:
+      operationId: products_categories_destroy
+      description: Deletes an existing category.
+      summary: Delete category
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - products
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: Category deleted successfully.
+        '404':
+          description: Category not found.
+  /api/products/products/:
+    get:
+      operationId: products_products_list
+      description: Returns a paginated list of products. Products can be filtered
+        by category and active status, searched by name or description, and ordered
+        by price or creation date.
+      summary: List products
+      parameters:
+      - in: query
+        name: category
+        schema:
+          type: integer
+        description: Filter products by category ID.
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+        description: Filter products by active status.
+      - in: query
+        name: ordering
+        schema:
+          type: string
+        description: Order by price or created_at. Prefix with '-' for descending
+          order.
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Search products by name or description.
+      tags:
+      - products
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProductList'
+          description: ''
+    post:
+      operationId: products_products_create
+      description: Creates a new product. The category is selected using category_id
+        and the slug is generated automatically.
+      summary: Create product
+      tags:
+      - products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+        '400':
+          description: Invalid product data.
+  /api/products/products/{slug}/:
+    get:
+      operationId: products_products_retrieve
+      description: Returns a product using its unique slug.
+      summary: Retrieve product
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        description: Unique product slug.
+        required: true
+      tags:
+      - products
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+        '404':
+          description: Product not found.
+    put:
+      operationId: products_products_update
+      description: Replaces an existing product.
+      summary: Update product
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+        '400':
+          description: Invalid product data.
+        '404':
+          description: Product not found.
+    patch:
+      operationId: products_products_partial_update
+      description: Partially updates an existing product.
+      summary: Partially update product
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProductRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProductRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProductRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+        '400':
+          description: Invalid product data.
+        '404':
+          description: Product not found.
+    delete:
+      operationId: products_products_destroy
+      description: Deletes an existing product.
+      summary: Delete product
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - products
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: Product deleted successfully.
+        '404':
+          description: Product not found.
+components:
+  schemas:
+    Cart:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CartItem'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - items
+      - updated_at
+      - user
+    CartItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        product:
+          type: integer
+        product_name:
+          type: string
+          readOnly: true
+        product_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          readOnly: true
+        quantity:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - product
+      - product_name
+      - product_price
+      - updated_at
+    CartItemRequest:
+      type: object
+      properties:
+        product:
+          type: integer
+        quantity:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+      required:
+      - product
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        slug:
+          type: string
+          readOnly: true
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+      required:
+      - id
+      - name
+      - slug
+    CategoryRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+      required:
+      - name
+    ChangePasswordRequest:
+      type: object
+      properties:
+        old_password:
+          type: string
+          writeOnly: true
+          minLength: 1
+        new_password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - new_password
+      - old_password
+    EmailVerificationRequest:
+      type: object
+      properties:
+        uid:
+          type: string
+          minLength: 1
+        token:
+          type: string
+          minLength: 1
+      required:
+      - token
+      - uid
+    LogoutRequest:
+      type: object
+      properties:
+        refresh:
+          type: string
+          minLength: 1
+      required:
+      - refresh
+    Order:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/OrderStatusEnum'
+          readOnly: true
+        total_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - items
+      - status
+      - total_price
+      - updated_at
+      - user
+    OrderItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        product:
+          type: integer
+        product_name:
+          type: string
+          readOnly: true
+        product_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          readOnly: true
+        quantity:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - product
+      - product_name
+      - product_price
+      - quantity
+    OrderStatusEnum:
+      enum:
+      - pending
+      - confirmed
+      - processing
+      - shipped
+      - delivered
+      - cancelled
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `confirmed` - Confirmed
+        * `processing` - Processing
+        * `shipped` - Shipped
+        * `delivered` - Delivered
+        * `cancelled` - Cancelled
+    PaginatedProductList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+    PasswordResetConfirmRequest:
+      type: object
+      properties:
+        uid:
+          type: string
+          minLength: 1
+        token:
+          type: string
+          minLength: 1
+        new_password:
+          type: string
+          writeOnly: true
+          minLength: 8
+        new_password_confirm:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - new_password
+      - new_password_confirm
+      - token
+      - uid
+    PasswordResetRequestRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+      required:
+      - email
+    PatchedCartItemRequest:
+      type: object
+      properties:
+        product:
+          type: integer
+        quantity:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+    PatchedCategoryRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+    PatchedProductRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+          minLength: 1
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        stock:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        is_active:
+          type: boolean
+        category_id:
+          type: integer
+          writeOnly: true
+    PatchedUserRequest:
+      type: object
+      properties:
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+    Payment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        order:
+          type: integer
+          readOnly: true
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        currency:
+          type: string
+          readOnly: true
+        payment_method:
+          allOf:
+          - $ref: '#/components/schemas/PaymentMethodEnum'
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/PaymentStatusEnum'
+          readOnly: true
+        transaction_id:
+          type: string
+          readOnly: true
+          nullable: true
+        failure_reason:
+          type: string
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - amount
+      - created_at
+      - currency
+      - failure_reason
+      - id
+      - order
+      - payment_method
+      - status
+      - transaction_id
+      - updated_at
+    PaymentCreateRequest:
+      type: object
+      properties:
+        payment_method:
+          type: string
+          minLength: 1
+          maxLength: 50
+      required:
+      - payment_method
+    PaymentMethodEnum:
+      enum:
+      - card
+      - bank_transfer
+      - cash
+      type: string
+      description: |-
+        * `card` - Card
+        * `bank_transfer` - Bank Transfer
+        * `cash` - Cash
+    PaymentStatusEnum:
+      enum:
+      - pending
+      - processing
+      - succeeded
+      - failed
+      - refunded
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `processing` - Processing
+        * `succeeded` - Succeeded
+        * `failed` - Failed
+        * `refunded` - Refunded
+    PaymentVerifyRequest:
+      type: object
+      properties:
+        transaction_id:
+          type: string
+          minLength: 1
+          maxLength: 255
+      required:
+      - transaction_id
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        slug:
+          type: string
+          readOnly: true
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        stock:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        category:
+          allOf:
+          - $ref: '#/components/schemas/Category'
+          readOnly: true
+      required:
+      - category
+      - created_at
+      - description
+      - id
+      - name
+      - price
+      - slug
+      - updated_at
+    ProductRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+          minLength: 1
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        stock:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        is_active:
+          type: boolean
+        category_id:
+          type: integer
+          writeOnly: true
+      required:
+      - category_id
+      - description
+      - name
+      - price
+    RegisterRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+          maxLength: 128
+        password_confirm:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - email
+      - password
+      - password_confirm
+    TokenObtainPairRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          writeOnly: true
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - email
+      - password
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+      required:
+      - access
+      - refresh
+    TokenRefreshRequest:
+      type: object
+      properties:
+        refresh:
+          type: string
+          minLength: 1
+      required:
+      - refresh
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+      required:
+      - email
+      - id
+    UserRequest:
+      type: object
+      properties:
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

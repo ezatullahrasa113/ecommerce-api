@@ -538,8 +538,8 @@ class CartAPITests(APITestCase):
         )
 
         self.assertIn(
-            "quantity",
-            response.data,
+            "Quantity must be at least 1.",
+            response.data["error"]["fields"]["quantity"],
         )
 
 
