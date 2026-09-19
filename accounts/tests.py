@@ -867,7 +867,7 @@ class RegistrationVerificationTests(APITestCase):
             email_body,
         )
 
-    def test_verification_makes_user_active(self):
+    def test_verification_makes_user_verified(self):
         response = self.register_user()
 
         self.assertEqual(

@@ -4,4 +4,7 @@ from .models import User
 # Register your models here.
 
 
-admin.site.register(User)
+@admin.register(User)
+class User(admin.ModelAdmin):
+    list_display = ('id','email','is_verified')
+
